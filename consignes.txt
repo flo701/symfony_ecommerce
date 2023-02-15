@@ -1,0 +1,21 @@
+CONSIGNE :
+    - Utiliser l'exemple W3.CSS "The Band" comme modèle de notre nouvelle application web, nommée "SymfonyEcommerce" : ***
+		https://www.w3schools.com/w3css/tryw3css_templates_band.htm
+    - Utiliser le terminal afin de pouvoir créer un nouveau projet Symfony en utilisant la commande indiquée dans le cours. ***
+    - Modifier le fichier .env de l'application, en indiquant l'adresse de connection et les identifiants du server MySQL. ***
+    - Utiliser la commande du terminal pour créer une nouvelle base de données nommée SymfonyEcommerce. ***
+    - Créer un nouveau Controller nommé IndexController (via le terminal). ***
+    - Modifier le fichier Twig index.html.twig, de manière à ce que celui-ci accueille le code source de la page template, moins les images. ***
+    - Implémenter le fichier W3.CSS dans notre application, dans un dossier css dans un dossier asset, afin que la mise en page du site soit appliquée. ***
+    - Dans le cadre de l'implémentation, faire en sorte que index.html.twig ne conserve que la thématique d'accueil (id="band"), héritant de base.html.twig qui conserve la structure de base de la page web ainsi que la prise en charge du fichier CSS. *** 
+    - Placer le header et le footer dans des pages Twig à part, dans un dossier créé, intitulé layout. ***
+    - Retirer le slideshow et la photo du bas de la structure de notre page web. ***
+
+// ----------------------------------------------------------------------------------------------------------------
+
+CONSIGNE :
+	- Dans notre header, nous avons un bouton de type menu déroulant, intitulé "CATEGORIES". En réutilisant le code de notre projet actuel et du projet précédent, faire en sorte que le menu déroulant CATEGORIES propose la liste des différentes catégories enregistrées dans notre base de données lorsque le bouton est survolé. L'affichage des catégories existantes doit être dynamique (suite à la récupération des catégories sur notre base de données et non pas écrit en dur).
+    - Créer, dans IndexController, une nouvelle méthode de classe, nommée indexCategory(), route index_category, laquelle affichera tous les Products sur notre page lié à la Category sélectionnée en question.
+    - Créer un lien hypertexte sur chaque catégorie du menu déroulant CATEGORIES, lequel mènera vers la route index_category, en renseignant quelle catégorie est celle qui sera liée aux Products qui seront présentés.
+
+// ----------------------------------------------------------------------------------------------------------------
