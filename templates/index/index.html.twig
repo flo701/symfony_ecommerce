@@ -1,5 +1,3 @@
-{# - Dans le cadre de l'implémentation, faire en sorte que index.html.twig ne conserve que la thématique d'accueil (id="band"), héritant de base.html.twig #}
-
 {% extends 'base.html.twig' %}
 
 {% block title %}Accueil -
@@ -26,7 +24,9 @@
 			{% for product in products %}
 				<div class="w3-third">
 					<p>{{ product.name }}</p>
-					<img src="{{ asset('assets/img/' ~ product.thumbnail ~ '.jpg') }}" class="w3-round w3-margin-bottom" alt="{{ product.name }}" style="width:60%">
+					<a href="{{ path('product_display', {'productId' : product.id }) }}">
+						<img src="{{ asset('assets/img/' ~ product.thumbnail ~ '.jpg') }}" class="w3-round w3-margin-bottom" alt="{{ product.name }}" style="width:60%">
+					</a>
 				</div>
 			{% endfor %}
 		</div>

@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BACKOFFICE ADMINISTRATEUR -
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+	<div class="w3-container w3-content w3-padding-64" style="max-width:800px" id="produitimmobilier">
+		<h2 class="w3-wide w3-center">BACKOFFICE ADMINISTRATEUR</h2>
+		<p class="w3-opacity w3-center">
+			<i>Liste des Tags et Produits</i>
+		</p>
+		<div class="w3-center">
+			<a href="{{ path('product_create') }}" class="w3-button w3-blue">
+				Créer Produit
+			</a>
+			<a href="{{ path('tag_create') }}" class="w3-button w3-green">
+				Créer Tags
+			</a>
+		</div>
+		<h3>Liste des produits</h3>
+		<ul class="w3-ul w3-border-white w3-white">
+			{% for product in products %}
+				<li class="w3-padding">
+					<p>
+						<b>{{ product.name }}</b>
+						:
+						{{ product.category.name }}
+						<a href="{{ path('product_delete', { 'productId' : product.id }) }}" class="w3-button w3-red w3-right">
+							Supprimer
+						</a>
+						<a href="{{ path('product_update', { 'productId' : product.id }) }}" class="w3-button w3-orange w3-right" style="margin-right:5px">
+							Modifier
+						</a>
+					</p>
+				</li>
+			{% endfor %}
+		</ul>
+		<h3>Liste des Tags</h3>
+		<ul class="w3-ul w3-border-white w3-white">
+			{% for tag in tags %}
+				<li class="w3-padding">
+					<p>
+						<b>{{ tag.name }}</b>
+						<a href="{{ path('tag_delete', { 'tagId' : tag.id }) }}" class="w3-button w3-red w3-right">
+							Supprimer
+						</a>
+					</p>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+{% endblock %}

@@ -19,3 +19,33 @@ CONSIGNE :
     - Créer un lien hypertexte sur chaque catégorie du menu déroulant CATEGORIES, lequel mènera vers la route index_category, en renseignant quelle catégorie est celle qui sera liée aux Products qui seront présentés.
 
 // ----------------------------------------------------------------------------------------------------------------
+
+CONSIGNE:
+	- Créer, dans notre IndexController, une nouvelle méthode de classe nommée displayProduct(). Cette méthode displayProduct() fait appel à un fichier Twig particulier que vous allez créer, le fichier product_display.html.twig, lequel servira à présenter les diverses caractéristiques d'un Product donné, désigné par le paramètre de route.
+    - Cette page product_display nous présente donc plusieurs éléments:
+    	-> Le nom du Product
+        -> Sa Category
+        -> Les Tags qui lui sont associés
+        -> La Vignette (thumbnail) qui lui est associée
+        -> Sa description
+        -> Le stock disponible
+        -> Le prix du Product
+        -> Un bouton "Acheter", lequel n'a aucun effet
+    - En ce qui concerne l'affichage des Tags sur la fiche Produit, insérer un lien hypertexte menant vers notre méthode indexTag(), de manière à ce que cliquer sur un Tag en question nous présente la liste de tous les Products liés au Tag.
+    - Créer pour chaque vignette de notre grille sur index(), indexTag() et indexCategory(), un lien hypertexte menant à notre méthode displayProduct() en renseignant l'ID du Product concerné
+
+// ----------------------------------------------------------------------------------------------------------------
+
+ CONSIGNE :
+	- Créer, dans IndexController, une nouvelle méthode de Controller nommée buyProduct(). La méthode buyProduct(), en utilisant l'indication du Product qui lui a fourni, retranchera de 1 la valeur du stock du Product UNIQUEMENT si ce dernier est supérieur à 0, avant de renvoyer l'Utilisateur vers la fiche Product qu'il était en train de consulter.
+    - Si la valeur du $stock du Product concerné est égale à 0 (ou moins), le bouton d'Achat ne doit pas être visible aux yeux de l'Utilisateur.
+
+// ----------------------------------------------------------------------------------------------------------------
+
+CONSIGNE :
+    En reprenant l'exemple de SymfonyBlog :
+    - Créer le fichier twig dataform au sein du dossier "index" de templates afin de fournir une page twig pour notre méthode createProduct() au sein de AdminController.
+    - Créer la méthode deleteProduct() dans AdminController, laquelle supprime un Product au sein de notre base de données.
+    - Créer la méthode deleteTag() dans AdminController, laquelle supprime un Tag au sein de notre base de données.
+
+// ---------------------------------------------------------------------------------------------------------------- 

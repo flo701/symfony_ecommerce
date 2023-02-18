@@ -51,7 +51,6 @@ class ProductFixtures extends Fixture
             $manager->persist($tag);
         }
 
-
         // Boucle de création de Products :
         // On crée une liste de catégories potentielles :
         $categories = ['chaise', 'bureau', 'lit', 'canape', 'armoire', 'autre'];

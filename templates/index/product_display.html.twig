@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Produit -
+	{{parent()}}
+{% endblock %}
+
+{% block body %}
+	<!-- About Section -->
+	<div class="w3-row w3-padding" id="about">
+		<div class="w3-col m6 w3-padding-large w3-hide-small" style="display:flex; justify-content: center; margin-top: 100px;">
+			<img src="{{ asset('assets/img/' ~ product.thumbnail ~ '.jpg') }}" class="w3-round w3-margin-bottom w3-padding-left-50" alt="{{ product.name }}" style="width:60%">
+		</div>
+		<div class="w3-col m6 w3-padding-large">
+			<h1 class="w3-center">
+				FICHE PRODUIT :
+				{{ product.name }}</h1><br>
+			<h5 class="w3-center">
+				<b>Catégorie :</b>
+				{{ product.category.name }}</h5>
+			<h5 class="w3-center">
+				<b>Tags :</b>
+				{% if product.tags is not empty %}
+					{% for tag in product.tags %}
+						<a href="{{ path('index_tag', {'tagId': tag.id}) }}" style="text-decoration:none;">
+							{{ tag.name }}
+						</a>;
+					{% endfor %}
+				{% else %}
+					<i>Aucun.</i>
+				{% endif %}
+			</h5>
+			<p class="w3-large">{{ product.description }}</p>
+			<h5 class="w3-center">
+				<b>Stock :</b>
+				{{ product.stock }}
+				unité(s) disponible(s)</h5>
+			<h5 class="w3-center">
+				<b>Prix :</b>
+				{{ product.price|number_format(2, ',') }}
+				€
+				{# On veut 2 chiffres après la virgule, et une virgule pour séparer les entiers des décimales #}
+			</h5>
+			{% if product.stock > 0 %}
+				<a href="{{ path('product_buy', {'productId' : product.id }) }}" style="text-decoration:none;">
+					<button class="w3-btn w3-ripple w3-teal" style="display:flex; margin:auto;">Acheter</button>
+				</a>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}
