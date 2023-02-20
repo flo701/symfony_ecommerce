@@ -3,15 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Tag;
+use App\Entity\Order;
 use App\Entity\Product;
+use App\Entity\Category;
 use App\Form\ProductType;
+use App\Entity\Reservation;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/admin')]
 class AdminController extends AbstractController
@@ -34,6 +37,116 @@ class AdminController extends AbstractController
         return $this->render('admin/admin_backoffice.html.twig', ['products' => $products, 'tags' => $tags,]);
     }
 
+    // -----------------------------------------------------------------------------------------------------------
+
+    #[Route('/catalog/reload', name: 'admin_reload')]
+    public function reloadCatalog(ManagerRegistry $doctrine): Response
+    {
+        // Cette méthode purge les trois tables Product, Tag et Category de notre base de données avant de les remplir avec une nouvelle liste de Category, de Tag et de Product factices.
+
+        // Afin de pouvoir dialoguer avec notre bdd, nous avons besoin de l'Entity Manager :
+        $entityManager = $doctrine->getManager();
+        // "Purger nos tables P/T/C"-> "Ces tables ne doivent avoir aucun contenu" => "Ces tables doivent avoir leur contenu supprimé" => "Il faut récupérer tout le contenu de ces tables et les supprimer"
+
+        // On récupère les Repositories pour récupérer le contenu à supprimer des tables :
+        $productRepository = $entityManager->getRepository(Product::class);
+        $categoryRepository = $entityManager->getRepository(Category::class);
+        $tagRepository = $entityManager->getRepository(Tag::class);
+
+        // On récupère également les Repositories de Order et de Reservation :
+        $reservationRepository = $entityManager->getRepository(Reservation::class);
+        $orderRepository = $entityManager->getRepository(Order::class);
+
+        // On récupère tout le contenu de ces tables :
+        $products = $productRepository->findAll();
+        $categories = $categoryRepository->findAll();
+        $tags = $tagRepository->findAll();
+        $reservations = $reservationRepository->findAll();
+        $orders = $orderRepository->findAll();
+
+        // Pour chaque élément récupéré, nous plaçons une demande de remove() via l'EntityManager dans une boucle :
+        foreach ($products as $product) {
+            $entityManager->remove($product);
+        }
+        foreach ($categories as $category) {
+            $entityManager->remove($category); // Les éléments OneToMany ne doivent être liés à aucun élément pour être supprimés sans erreur de contrainte de clef étrangère
+        }
+        foreach ($tags as $tag) {
+            $entityManager->remove($tag);
+        }
+        foreach ($reservations as $reservation) {
+            $entityManager->remove($reservation);
+        }
+        foreach ($orders as $order) {
+            $entityManager->remove($order);
+        }
+        $entityManager->flush(); // On applique les demandes de suppression
+
+        // On copie/colle la fonction load() de ProductFixtures (ne pas oublier de renommer $manager en $entityManager) :
+
+        // On commence par créer nos différentes Categories, lesquelles seront utilisées pour classifier nos différents Products :
+
+        // Un lorem à utiliser :
+        $lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+        ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur
+        adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+
+        // La liste de nos différentes catégories sous la forme d'un tableau associatif, contenant une indication du type de catégorie sous la clef et l'objet Category en valeur. Etant donné que nous allons instancier nos Categories juste après dans une boucle, la valeur actuelle de ces différentes clefs est null :
+        $categoryArray = [
+            'chaise' => null,
+            'bureau' => null,
+            'lit' => null,
+            'canape' => null,
+            'armoire' => null,
+            'autre' => null,
+        ];
+
+        // On prépare l'instanciation de nos catégories, leur persistance et leur placement au sein de notre tableau $categoryArray :
+        foreach ($categoryArray as $key => &$value) {
+            // Le & avant $value est un passage en référence, ce qui signifie que nous récupérons la variable en tant que telle plutôt que sa valeur, ce qui nous permet de modifier notre tableau $categoryArray plutôt qu'une copie de $value, qui sera perdue après la boucle :
+            $value = new Category; // A chaque valeur est attribué un objet Category
+            $value->setName(ucfirst($key)); // Le nom est la clef capitalisée de l'entrée actuellement itérée du tableau
+            $value->setDescription($lorem); // La description est le lorem ipsum que nous avions préparé
+            $entityManager->persist($value); // Demande de persistance de notre nouvelle Category
+        }
+
+        // Nous allons préparer une collection de Tags :
+        $tagNames = ["Bois", "Nouveau", "Promotion", "Mobilier", "Bon marché", "Occasion", "Design", "Pas cher", "Synthétique", "Au top"];
+        $tags = []; // Tableau qui conservera les Tags
+        foreach ($tagNames as $tagName) {
+            // On crée une boucle foreach, laquelle va parcourir le tableau de tagNames, et utiliser chaque chaîne de caractères pour initialiser et renseigner un nouveau Tag, enregistré dans le tableau $tags :
+            $tag = new Tag;
+            $tag->setName($tagName);
+            array_push($tags, $tag);
+            $entityManager->persist($tag);
+        }
+
+        // Boucle de création de Products.
+        // On crée une liste de catégories potentielles :
+        $categories = ['chaise', 'bureau', 'lit', 'canape', 'armoire', 'autre'];
+        for ($i = 0; $i < 150; $i++) {
+            // On sélectionne un nom de catégorie au hasard qui servira à nommer le Product et à déterminer la clef que nous sélectionnons dans $categoryArray :
+            $selectedCategory = $categories[rand(0, (count($categories) - 1))];
+            $product = new Product;
+            $product->setName(ucfirst($selectedCategory) . " #" . rand(1000, 9999));
+            $product->setStock(rand(0, 200));
+            $product->setPrice(rand(0, 200));
+            $product->setDescription($lorem);
+            // Nous récupérons l'objet de categoryArray tenu par la clef dont le nom est fourni par la valeur de $selectedCategory :
+            $product->setCategory($categoryArray[$selectedCategory]);
+            foreach ($tags as $tag) {
+                if (rand(1, 10) > 8) { // 20% de chance que la condition soit remplie
+                    $product->addTag($tag); // On lie le Product au Tag actuellement parcouru
+                }
+            }
+            $entityManager->persist($product);
+        }
+        $entityManager->flush();
+
+
+        // Une fois tout effectué, nous retournons au backoffice :
+        return $this->redirectToRoute('admin_backoffice');
+    }
     // -----------------------------------------------------------------------------------------------------------
 
     #[Route('/product/create', name: 'product_create')]
@@ -258,4 +371,8 @@ class AdminController extends AbstractController
         $entityManager->flush();
         return $this->redirectToRoute('admin_backoffice');
     }
+
+    // -----------------------------------------------------------------------------------------------------------
+
+
 }

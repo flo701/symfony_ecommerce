@@ -48,4 +48,14 @@ CONSIGNE :
     - Créer la méthode deleteProduct() dans AdminController, laquelle supprime un Product au sein de notre base de données.
     - Créer la méthode deleteTag() dans AdminController, laquelle supprime un Tag au sein de notre base de données.
 
+// ----------------------------------------------------------------------------------------------------------------
+
+CONSIGNE :
+	- Créer, dans notre AdminController, une nouvelle méthode de Controller nommée reloadCatalog() ('/catalog/reload', name: 'admin_reload'), laquelle sera une route faisant le travail des Fixtures sans que nous ayons à passer par le terminal. Cette route sera liée à un bouton rouge "Réinitialiser Catalogue" présent sur notre page Backoffice.
+    - Par "travail des Fixtures", nous entendons:
+    	- Vider le contenu des tables Category, Product, et Tag
+        - Créer une sélection de 150 Products à l'image de ProductsFixtures
+        - Créer les Tags liés et les lier aléatoirement aux instances de Product avant de les persister
+        - Créer les Categories liées et les lier selon le nom du Product avant de les persister
+
 // ---------------------------------------------------------------------------------------------------------------- 

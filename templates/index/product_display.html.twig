@@ -40,11 +40,11 @@
 				€
 				{# On veut 2 chiffres après la virgule, et une virgule pour séparer les entiers des décimales #}
 			</h5>
-			{% if product.stock > 0 %}
-				<a href="{{ path('product_buy', {'productId' : product.id }) }}" style="text-decoration:none;">
-					<button class="w3-btn w3-ripple w3-teal" style="display:flex; margin:auto;">Acheter</button>
-				</a>
-			{% endif %}
+			<div class="w3-center">
+				{% if product.stock > 0 %}
+					{{ form(buyForm) }}{% endif %}
+				</div>
+			</div>
 		</div>
 	</div>
 {% endblock %}
