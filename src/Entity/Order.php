@@ -38,6 +38,25 @@ class Order
         $this->creationDate = new \DateTime("now");
     }
 
+    public function getTotalPrice(): float
+    {
+        // Cette méthode retourne le prix total de la commande, laquelle est calculée en multipliant la quantité de chaque Reservation enregistrée avec le prix (la valeur $price) de chaque Product lié à la Reservation. Le prix total est obtenu en additionnant le résultat fourni par chaque Reservation.
+        // Les deux valeurs nécessaires sont la valeur $quantity de Reservation, et $price de Product.
+
+        // On prépare la variable appelée à contenir le prix total :
+        $totalPrice = 0;
+        //  Dans une boucle foreach itérant à travers nos Reservations, nous ajoutons chaque calcul (prix*quantité) à notre variable $totalPrice :
+        foreach ($this->reservations as $reservation) {
+            // On récupère le prix rangé dans l'attribut $price du Product lié :
+            if ($reservation->getProduct()) { // Sécurité : on vérifie que le Product existe toujours
+                $price = $reservation->getProduct()->getPrice();
+            } else $price = 0;
+            //  On multiplie les deux valeurs et on ajoute le résultat à $totalPrice :
+            $totalPrice += ($price * $reservation->getQuantity());
+        }
+        return $totalPrice;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

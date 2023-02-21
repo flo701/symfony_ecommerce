@@ -1,7 +1,92 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tableau de bord -
+{% block title %}
+	Tableau de bord -
 	{{ parent() }}
 {% endblock %}
 
-{% block body %}{% endblock %}
+{% block body %}
+	<div class="w3-container w3-content w3-padding-64" style="max-width:800px" id="dashboard">
+		<h1>Tableau de bord Client</h1>
+		<h2>Commande Active</h2>
+		{% if activeOrder is not null %}
+			{{ dump("dump de activeOrder :", activeOrder) }}
+			<table class="w3-table-all" style="margin-top:50px">
+				<tr>
+					<th>Utilisateur</th>
+					<th>Statut:
+						{{ activeOrder.status|capitalize }}</th>
+					<th>Prix:
+						{{ activeOrder.totalPrice|number_format(2, ',') }}€</th>
+					<th>
+						<a href="{{ path('order_validate')}}" class="w3-button w3-blue-gray" type="button">Valider commande</a>
+					</th>
+					<th>
+						<a href="{{ path('order_delete', {'orderId' : activeOrder.id}) }}" class="w3-button w3-red" type="button">Supprimer commande</a>
+					</th>
+				</tr>
+				<tr>
+					<th>Produit</th>
+					<th>Quantité</th>
+					<th>Prix</th>
+					<th>Date d'ajout au panier</th>
+					<th>Supprimer</th>
+				</tr>
+				{{ dump("dump de activeOrder.reservations :", activeOrder.reservations)}}
+				{% for reservation in activeOrder.reservations %}
+					{{ dump("dump de reservation :", reservation)}}
+					<tr>
+						<td>{{ reservation.product.name }}</td>
+						<td>{{ reservation.quantity }}</td>
+						<td>{{ reservation.product.price|number_format(2, ',') }}€</td>
+						<td>Le
+							{{ reservation.creationDate|date("d/m/Y à G:i") }}</td>
+						<td>
+							<a href="{{ path('reservation_delete', {'reservationId' : reservation.id}) }}" class="w3-button w3-red" type="button">Supprimer</a>
+						</td>
+					</tr>
+				{% endfor %}
+			</table>
+		{% else %}
+			<p>
+				<b>Vous n'avez aucune commande en panier.</b>
+			</p>
+		{% endif %}
+		<h2 style="margin-top:50px">Commandes archivées</h2>
+		{% if archivedOrders is not empty %}
+			{{ dump("dump de archivedOrders :", archivedOrders) }}
+			{% for order in archivedOrders %}
+				<table class="w3-table-all" style="margin-top:50px">
+					<tr>
+						<th>Utilisateur</th>
+						<th>Statut:
+							{{ order.status|capitalize }}</th>
+						<th>Prix:
+							{{ order.totalPrice|number_format(2, ',') }}€</th>
+					</tr>
+					<tr>
+						<th>Produit</th>
+						<th>Quantité</th>
+						<th>Prix</th>
+						<th>Date d'ajout au panier</th>
+					</tr>
+					{{ dump("dump de order.reservations :", order.reservations)}}
+					{% for reservation in order.reservations %}
+						{{ dump("dump de reservation :", reservation)}}
+						<tr>
+							<td>{{ reservation.product.name }}</td>
+							<td>{{ reservation.quantity }}</td>
+							<td>{{ reservation.product.price|number_format(2, ',') }}€</td>
+							<td>Le
+								{{ reservation.creationDate|date("d/m/Y à G:i") }}</td>
+						</tr>
+					{% endfor %}
+				</table>
+			{% endfor %}
+		{% else %}
+			<p>
+				<b>Vous n'avez aucune commande enregistrée.</b>
+			</p>
+		{% endif %}
+	</div>
+{% endblock %}

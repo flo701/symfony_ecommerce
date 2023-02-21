@@ -59,3 +59,15 @@ CONSIGNE :
         - Créer les Categories liées et les lier selon le nom du Product avant de les persister
 
 // ---------------------------------------------------------------------------------------------------------------- 
+
+CONSIGNE :
+	- Dans OrderController:
+    	- Modifier pour la méthode orderDashboard le fichier dashboard.html.twig de manière à ce que ce dernier présente la liste des entrées de Reservation liées à chaque commande.
+        - Créer une méthode de classe deleteReservation(), supprimant une Reservation
+        - Créer une méthode de classe deleteOrder(), laquelle supprime une commande APRES avoir supprimé toutes les Reservation liées
+        - Créer une méthode validateOrder(), laquelle change le statut de la commande actuelle de "panier" à "validée"
+        - Créer trois boutons pour chaque méthode dans dashboard.html.twig
+        
+        Correction après pause: 11h
+
+// ----------------------------------------------------------------------------------------------------------------
