@@ -9,23 +9,23 @@
 	<div class="w3-container w3-content w3-padding-64" style="max-width:800px" id="dashboard">
 		<h1>Tableau de bord Client</h1>
 		<h2>Commande Active</h2>
-		{% if activeOrder is not null %}
+		{% if activeOrders is not null %}
 			{{ dump("dump de activeOrder :", activeOrder) }}
 			<table class="w3-table-all" style="margin-top:50px">
 				<tr>
 					<th>
 						<b>Utilisateur
 						</b>:
-						{{ activeOrder.user.userIdentifier }}</th>
+						{{ activeOrders.user.userIdentifier }}</th>
 					<th>Statut:
-						{{ activeOrder.status|capitalize }}</th>
+						{{ activeOrders.status|capitalize }}</th>
 					<th>Prix:
-						{{ activeOrder.totalPrice|number_format(2, ',') }}€</th>
+						{{ activeOrders.totalPrice|number_format(2, ',') }}€</th>
 					<th>
 						<a href="{{ path('order_validate')}}" class="w3-button w3-blue-gray" type="button">Valider commande</a>
 					</th>
 					<th>
-						<a href="{{ path('order_delete', {'orderId' : activeOrder.id}) }}" class="w3-button w3-red" type="button">Supprimer commande</a>
+						<a href="{{ path('order_delete', {'orderId' : activeOrders.id}) }}" class="w3-button w3-red" type="button">Supprimer commande</a>
 					</th>
 				</tr>
 			</th>
@@ -38,7 +38,7 @@
 			<th>Supprimer</th>
 		</tr>
 		{{ dump("dump de activeOrder.reservations :", activeOrder.reservations)}}
-		{% for reservation in activeOrder.reservations %}
+		{% for reservation in activeOrders.reservations %}
 			{{ dump("dump de reservation :", reservation)}}
 			<tr>
 				<td>{{ reservation.product.name }}</td>

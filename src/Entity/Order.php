@@ -29,6 +29,9 @@ class Order
     #[ORM\OneToMany(mappedBy: 'clientOrder', targetEntity: Reservation::class)]
     private Collection $reservations;
 
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->reservations = new ArrayCollection();
@@ -124,6 +127,18 @@ class Order
                 $reservation->setClientOrder(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

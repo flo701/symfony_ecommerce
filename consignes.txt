@@ -71,3 +71,16 @@ CONSIGNE :
         Correction après pause: 11h
 
 // ----------------------------------------------------------------------------------------------------------------
+
+CONSIGNE :
+	- Aller dans le Backoffice Administrateur, et effectuer une réinitialisation des Products et des différentes Entities (cliquer sur le bouton rouge)
+	- Faire en sorte dans notre méthode productDisplay(), qu'à chaque nouvelle commande (Order) occasionnée par une Reservation, l'Utilisateur connecté soit lié à la commande via relations entre Entity.
+    - Faire en sorte qu'il soit impossible pour un utilisateur non connecté de passer une commande.
+
+// ----------------------------------------------------------------------------------------------------------------
+
+CONSIGNE :
+	- Relisez et assimilez la logique de OrderController.
+    - OrderController pour l'instant permet à tout utilisateur de valider, modifier ou supprimer n'importe quelle commande tant que son ID est renseigné. Modifier nos méthodes deleteOrder(), deleteReservation(), et validateOrder() de manière à ce que seul un User lié à la commande soit capable de supprimer ou valider les commandes via ces méthodes.
+
+// ----------------------------------------------------------------------------------------------------------------

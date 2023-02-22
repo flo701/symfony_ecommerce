@@ -123,6 +123,9 @@ class IndexController extends AbstractController
     {
         // Cette route nous affiche un product donné ainsi que ses caractéristiques selon l'ID du product qui nous a été transmis via le paramètre de route.
 
+        // Nous récupérons l'Utilisateur en cours :
+        $user = $this->getUser();
+
         // Afin de pouvoir récupérer notre Product, nous avons besoin de l'Entity Manager ainsi que du Repository de Product :
         $entityManager = $doctrine->getManager();
         $productRepository = $entityManager->getRepository(Product::class);
@@ -165,7 +168,7 @@ class IndexController extends AbstractController
         // Si notre formulaire d'achat a été rempli, nous procédons à l'achat en question :
         if ($buyForm->isSubmitted() && $buyForm->isValid()) {
             $quantity = $buyForm->getData()['quantity']; // On récupère la valeur de la clef 'quantity' du tableau obtenu en réponse de la méthode getData() sur notre formulaire $buyForm
-            if ($product->getStock() > 0) {
+            if ($product->getStock() > 0 && $user) {
                 if ($product->getStock() > $quantity) { // Suffisamment de stock
                     $product->setStock($product->getStock() - $quantity);
                 } else { // Pas suffisamment de stock
@@ -178,6 +181,8 @@ class IndexController extends AbstractController
                 $order = $orderRepository->findOneBy(['status' => 'panier']);
                 if (!$order) { // Si aucune commande "panier" n'est trouvée
                     $order = new Order; // Nous créons la commande
+                    $order->setUser($user); // On lie l'utilisateur à la nouvelle commande
+                    // $this->getUser() permet de récupérer automatiquement l'utilisateur 
                 }
                 $reservation->setClientOrder($order); // Nous lions la Reservation à la commande créée ou récupérée
                 // On persiste nos Products, Reservation et Order :
