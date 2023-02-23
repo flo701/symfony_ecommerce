@@ -166,10 +166,10 @@ class AdminController extends AbstractController
         }
         $entityManager->flush();
 
-
         // Une fois tout effectué, nous retournons au backoffice :
         return $this->redirectToRoute('admin_backoffice');
     }
+
     // -----------------------------------------------------------------------------------------------------------
 
     #[Route('/product/create', name: 'product_create')]
@@ -397,8 +397,8 @@ class AdminController extends AbstractController
 
     // -----------------------------------------------------------------------------------------------------------
 
-    #[Route('order/validate', name: 'order_validate_admin')]
-    public function validateOrderAdmin(ManagerRegistry $doctrine): Response
+    #[Route('order/validate/{orderId}', name: 'order_validate_admin')]
+    public function validateOrderAdmin(ManagerRegistry $doctrine, int $orderId): Response
     {
         // Cette route récupère la commande en mode Panier et la place en mode Validée, à travers le changement de la valeur de l'attribut $status de la commande (Order) en question .
 
@@ -406,16 +406,16 @@ class AdminController extends AbstractController
         $entityManager = $doctrine->getManager();
         $orderRepository = $entityManager->getRepository(Order::class);
         // Nous récupérons la commande en mode Panier. Si celle-ci n'existe pas, nous retournons à notre tableau de bord :
-        $order = $orderRepository->findOneBy(['status' => 'panier'], ['id' => 'DESC']);
+        $order = $orderRepository->findOneBy(['status' => 'panier', 'id' => $orderId], ['id' => 'DESC']);
         if (!$order) {
-            return $this->redirectToRoute('order_dashboard');
+            return $this->redirectToRoute('order_dashboard_admin');
         }
         // On change le statut de notre commande en "Validée" avant de revenir à notre tableau de bord :
         $order->setStatus('validée');
         $entityManager->persist($order);
         $entityManager->flush();
         // Nous retournons au tableau de bord :
-        return $this->redirectToRoute('order_dashboard');
+        return $this->redirectToRoute('order_dashboard_admin');
     }
 
     // -----------------------------------------------------------------------------------------------------------
@@ -431,7 +431,7 @@ class AdminController extends AbstractController
         // On récupère la commande grâce à la méthode find() de Order, mais si cette entrée de table n'est pas trouvée, on revient au tableau de bord :
         $order = $orderRepository->find($orderId);
         if (!$order) {
-            return $this->redirectToRoute('order_dashboard');
+            return $this->redirectToRoute('order_dashboard_admin');
         }
 
         // Si notre commande est active (en mode panier), nous supprimons chacune de ses Reservations :
@@ -448,7 +448,7 @@ class AdminController extends AbstractController
         $entityManager->remove($order);
         $entityManager->flush();
         // On repart sur le tableau de bord :
-        return $this->redirectToRoute('order_dashboard');
+        return $this->redirectToRoute('order_dashboard_admin');
     }
 
     // -----------------------------------------------------------------------------------------------------------
@@ -464,7 +464,7 @@ class AdminController extends AbstractController
         // On récupère la Reservation dont l'ID nous est indiqué dans l'URL. Si cette Reservation n'existe pas, nous retournons au tableau de bord :
         $reservation = $reservationRepository->find($reservationId);
         if (!$reservation) {
-            return $this->redirectToRoute('order_dashboard');
+            return $this->redirectToRoute('order_dashboard_admin');
         }
 
         // Une fois notre élément récupéré, nous procédons à sa suppression (si la commande est en cours).
@@ -487,7 +487,7 @@ class AdminController extends AbstractController
             $entityManager->flush();
         }
         // On retourne vers notre tableau de bord :
-        return $this->redirectToRoute('order_dashboard');
+        return $this->redirectToRoute('order_dashboard_admin');
     }
 
     // -----------------------------------------------------------------------------------------------------------

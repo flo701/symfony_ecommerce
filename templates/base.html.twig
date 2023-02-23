@@ -28,16 +28,33 @@
 		{% include 'layout/header.html.twig' %}
 
 		<!-- Page content -->
-		<div class="w3-content" style="max-width:2000px;margin-top:46px"> {% block body %}{% endblock %}
+		<div
+			class="w3-content" style="max-width:2000px;margin-top:46px">
+
+			{# Un Flashbag est un message supprimé après affichage. Notre boucle ici, chargée à chaque utilisation de base.html.twig et placée avant le bloc twig body, permet d'afficher le message en évidence. #}
+			{% if app.session.get('infopanel') is defined and app.session.get('infopanel') == true %}
+				<div class="w3-panel w3-pale-{{ app.session.get('status') }}" style="max-width:800px; margin:auto">
+					<h3>{{ app.session.get('message_title') }}</h3>
+					<p>
+						{% for message in app.session.flashbag.get('info') %}
+							{{ message }}<br>
+						{% endfor %}
+					</p>
+				</div>
+				{{ app.session.set('infopanel', false) }}
+			{% endif %}
+
+			{% block body %}{% endblock %}
 
 			{% include 'layout/contact.html.twig' %}
 			<!-- End Page Content -->
 		</div>
-
-		{% include 'layout/header.html.twig' %}
-		{% block javascripts %}
-			<script>
-				// Used to toggle the menu on small screens when clicking on the menu button
+	</body>
+</html>
+{% include 'layout/header.html.twig' %}
+{% block javascripts %}
+	<script>
+		// Used to toggle the menu on small screens when clicking on the menu button
 function myFunction() {
 var x = document.getElementById("navDemo");
 if (x.className.indexOf("w3-show") == -1) {
@@ -54,7 +71,5 @@ if (event.target == modal) {
 modal.style.display = "none";
 }
 }
-			</script>
-		{% endblock %}
-	</body>
-</html>
+	</script>
+{% endblock %}</body></html></body></body></html>

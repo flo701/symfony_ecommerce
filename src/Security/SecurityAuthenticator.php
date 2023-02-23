@@ -47,10 +47,10 @@ class SecurityAuthenticator extends AbstractLoginFormAuthenticator
         }
 
         // For example:
-        // return new RedirectResponse($this->urlGenerator->generate('some_route'));
+        // return new RedirectResponse($this->urlGenerator->generate('some_route')); // Ligne que nous modifions
+        return new RedirectResponse($this->urlGenerator->generate('app_index'));
         // throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);  // Ligne que nous commentons
 
-        return new RedirectResponse($this->urlGenerator->generate('app_index')); // Ligne que nous ajoutons
     }
 
     protected function getLoginUrl(Request $request): string

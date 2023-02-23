@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Order;
 use App\Entity\Reservation;
+use App\Service\EcomToolbox;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -29,7 +31,7 @@ class OrderController extends AbstractController
         // On récupère notre commande active et la liste de nos commandes archivées :
         $activeOrder = $orderRepository->findOneBy(['status' => 'panier', 'user' => $user], ['id' => 'DESC']);
         $archivedOrders = $orderRepository->findBy(['status' => 'validée', 'user' => $user], ['id' => 'DESC']);
-        // dd($archivedOrders);
+        // dd($activeOrder);
         return $this->render('order/dashboard.html.twig', [
             'activeOrder' => $activeOrder,
             'archivedOrders' => $archivedOrders,
@@ -39,7 +41,7 @@ class OrderController extends AbstractController
     // -----------------------------------------------------------------------------------------------------------
 
     #[Route('order/validate', name: 'order_validate')]
-    public function validateOrder(ManagerRegistry $doctrine): Response
+    public function validateOrder(ManagerRegistry $doctrine, EcomToolbox $toolbox): Response
     {
         // Cette route récupère la commande en mode Panier et la place en mode Validée, à travers le changement de la valeur de l'attribut $status de la commande (Order) en question, SEULEMENT si nous sommes connectés avec le compte User lié à la commande.
 
@@ -52,12 +54,30 @@ class OrderController extends AbstractController
         // Nous récupérons la commande en mode Panier. Si celle-ci n'existe pas, nous retournons à notre tableau de bord :
         $order = $orderRepository->findOneBy(['status' => 'panier'], ['id' => 'DESC']);
         if (!$order || ($user != $order->getUser())) {
+            if ($order && $user != $order->getUser()) {
+                // Création du flashbag :
+                $toolbox->generateFlashbag(
+                    [
+                        'Impossible de valider cette commande.',
+                    ],
+                    'Commande',
+                    'red'
+                );
+            }
             return $this->redirectToRoute('order_dashboard');
         }
         // On change le statut de notre commande en "Validée" avant de revenir à notre tableau de bord :
         $order->setStatus('validée');
         $entityManager->persist($order);
         $entityManager->flush();
+        // Création du flashbag :
+        $toolbox->generateFlashbag(
+            [
+                'Votre commande a bien été validée.',
+            ],
+            'Commande',
+            'green'
+        );
         // Nous retournons au tableau de bord :
         return $this->redirectToRoute('order_dashboard');
     }
@@ -65,7 +85,7 @@ class OrderController extends AbstractController
     // -----------------------------------------------------------------------------------------------------------
 
     #[Route('/order/delete/{orderId}', name: 'order_delete')]
-    public function deleteOrder(ManagerRegistry $doctrine, int $orderId): Response
+    public function deleteOrder(ManagerRegistry $doctrine, int $orderId, EcomToolbox $toolbox): Response
     {
         // Cette méthode supprime une commande (Order) ainsi que toutes les Reservations qui lui sont liées.
 
@@ -78,6 +98,16 @@ class OrderController extends AbstractController
         // On récupère la commande grâce à la méthode find() de Order, mais si cette entrée de table n'est pas trouvée, on revient au tableau de bord :
         $order = $orderRepository->find($orderId);
         if (!$order || ($order->getUser() != $user)) {
+            if ($order && $user != $order->getUser()) {
+                // Création du flashbag :
+                $toolbox->generateFlashbag(
+                    [
+                        'Impossible de supprimer cette commande.',
+                    ],
+                    'Commande',
+                    'red'
+                );
+            }
             return $this->redirectToRoute('order_dashboard');
         }
 
@@ -94,6 +124,14 @@ class OrderController extends AbstractController
         // Une fois que toutes nos Reservations ont reçu une requête de suppression, nous pouvons demander à supprimer notre commande :
         $entityManager->remove($order);
         $entityManager->flush();
+        // Création du flashbag :
+        $toolbox->generateFlashbag(
+            [
+                'Votre commande a bien été supprimée.',
+            ],
+            'Commande',
+            'yellow'
+        );
         // On repart sur le tableau de bord :
         return $this->redirectToRoute('order_dashboard');
     }
@@ -101,7 +139,7 @@ class OrderController extends AbstractController
     // -----------------------------------------------------------------------------------------------------------
 
     #[Route('/reservation/delete/{reservationId}', name: 'reservation_delete')]
-    public function deleteReservation(ManagerRegistry $doctrine, int $reservationId): Response
+    public function deleteReservation(ManagerRegistry $doctrine, int $reservationId, EcomToolbox $toolbox): Response
     {
         // Cette méthode permet la suppression d'une Reservation (d'une commande en cours) dont nous avons renseigné l'Id via le paramètre de route, SEULEMENT si nous sommes l'Utilsateur associé à la commande.
 
@@ -114,6 +152,16 @@ class OrderController extends AbstractController
         // On récupère la Reservation dont l'ID nous est indiqué dans l'URL. Si cette Reservation n'existe pas, nous retournons au tableau de bord :
         $reservation = $reservationRepository->find($reservationId);
         if (!$reservation || ($reservation->getClientOrder()->getUser()) != $user) {
+            if ($reservation && ($reservation->getClientOrder()->getUser() != $user)) {
+                // Création du flashbag :
+                $toolbox->generateFlashbag(
+                    [
+                        'Impossible de supprimer ce produit.',
+                    ],
+                    'Commande',
+                    'red'
+                );
+            }
             return $this->redirectToRoute('order_dashboard');
         }
 
@@ -136,6 +184,14 @@ class OrderController extends AbstractController
             $entityManager->remove($reservation);
             $entityManager->flush();
         }
+        // Création du flashbag :
+        $toolbox->generateFlashbag(
+            [
+                'Votre produit a bien été supprimé.',
+            ],
+            'Commande',
+            'yellow'
+        );
         // On retourne vers notre tableau de bord :
         return $this->redirectToRoute('order_dashboard');
     }

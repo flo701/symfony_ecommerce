@@ -7,6 +7,7 @@ use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\Category;
 use App\Entity\Reservation;
+use App\Service\EcomToolbox;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class IndexController extends AbstractController
 {
     #[Route('/', name: 'app_index')]
-    public function index(ManagerRegistry $doctrine): Response
+    public function index(ManagerRegistry $doctrine, EcomToolbox $toolbox): Response
     {
         // Afficher la liste de tous nos produits.
 
@@ -40,8 +41,10 @@ class IndexController extends AbstractController
 
         // On envoie nos products vers la page index.html.twig :
         return $this->render('index/index.html.twig', [
+            'time' => $toolbox->tellTime(),
             'categories' => $categories,
             'products' => $products,
+            'user' => $this->getUser(),
         ]);
     }
 
@@ -119,7 +122,7 @@ class IndexController extends AbstractController
     // -----------------------------------------------------------------------------------------------------------
 
     #[Route('/product/display/{productId}', name: 'product_display')]
-    public function displayProduct(ManagerRegistry $doctrine, Request $request, int $productId): Response
+    public function displayProduct(ManagerRegistry $doctrine, Request $request, int $productId, EcomToolbox $toolbox): Response
     {
         // Cette route nous affiche un product donné ainsi que ses caractéristiques selon l'ID du product qui nous a été transmis via le paramètre de route.
 
@@ -171,14 +174,31 @@ class IndexController extends AbstractController
             if ($product->getStock() > 0 && $user) {
                 if ($product->getStock() > $quantity) { // Suffisamment de stock
                     $product->setStock($product->getStock() - $quantity);
+                    // Création du flashbag de succès de réservation, en activant le panneau, en indiquant le titre et le statut (couleur du panneau), et enfin les messages flash à afficher ::
+                    $toolbox->generateFlashbag(
+                        [
+                            'Votre commande a bien été prise en compte',
+                        ],
+                        'Achat',
+                        'green'
+                    );
                 } else { // Pas suffisamment de stock
                     $quantity = $product->getStock(); // La quantité effectivement retenue est celle du stock restant
                     $product->setStock(0); // On met le stock à zéro
+                    // Création du flashbag :
+                    $toolbox->generateFlashbag(
+                        [
+                            'La quantité demandée excède le stock disponible.',
+                            'La quantité retenue pour votre commande est de : ' . $quantity . ' unités.',
+                        ],
+                        'Achat',
+                        'yellow'
+                    );
                 }
                 // On crée notre nouvelle Reservation :
                 $reservation = new Reservation($quantity, $product);
-                // Nous vérifions si nous avons une commande (Order) en cours (en mode panier) :
-                $order = $orderRepository->findOneBy(['status' => 'panier']);
+                // Nous vérifions si nous avons une commande (Order) en cours (en mode panier) et dont l'utilisateur est l'utilisateur connecté :
+                $order = $orderRepository->findOneBy(['status' => 'panier', 'user' => $user]);
                 if (!$order) { // Si aucune commande "panier" n'est trouvée
                     $order = new Order; // Nous créons la commande
                     $order->setUser($user); // On lie l'utilisateur à la nouvelle commande
@@ -201,7 +221,7 @@ class IndexController extends AbstractController
 
     // -----------------------------------------------------------------------------------------------------------
 
-    #[Route('/product/buy/{productId}', name: 'product_buy')]
+    ##[Route('/product/buy/{productId}', name: 'product_buy')] // On met 2 # pour bloquer la route, car elle n'est plus utile
     public function buyProduct(ManagerRegistry $doctrine, int $productId)
     {
         // Cette méthode simule un processus d'achat en retranchant de la valeur au stock d'un Product dont l'ID nous est communiqué dans l'URL.
@@ -236,5 +256,4 @@ class IndexController extends AbstractController
     }
 
     // -----------------------------------------------------------------------------------------------------------
-
 }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Service\EcomToolbox;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +22,7 @@ class SecurityController extends AbstractController
 {
     #[Security('is_granted("ROLE_ADMIN")')]
     #[Route('admin/register', name: 'admin_register')]
-    public function registerAdmin(Request $request, ManagerRegistry $doctrine, UserPasswordHasherInterface $passHasher): Response
+    public function registerAdmin(Request $request, ManagerRegistry $doctrine, UserPasswordHasherInterface $passHasher, EcomToolbox $toolbox): Response
     {
         // Cette route permet la création d'un compte utilisateur avec des privilèges Administrateur.
 
@@ -86,6 +87,15 @@ class SecurityController extends AbstractController
             // On persiste notre Entity :
             $entityManager->persist($user);
             $entityManager->flush();
+            // Création du flashbag :
+            $toolbox->generateFlashbag(
+                [
+                    'Votre inscription s\'est bien déroulée.',
+                ],
+                'Inscription',
+                'green'
+            );
+
             // Après le transfert de notre Entity User, on retourne sur l'index :
             return $this->redirectToRoute('app_index');
         }
@@ -99,7 +109,7 @@ class SecurityController extends AbstractController
     // -------------------------------------------------------------------------------------------------
 
     #[Route('register', name: 'app_register')]
-    public function registerUser(Request $request, ManagerRegistry $doctrine, UserPasswordHasherInterface $passHasher): Response
+    public function registerUser(Request $request, ManagerRegistry $doctrine, UserPasswordHasherInterface $passHasher, EcomToolbox $toolbox): Response
     {
         // Cette méthode permet la création d'un compte Client via un formulaire :
 
@@ -152,6 +162,15 @@ class SecurityController extends AbstractController
             // On persiste notre Entity :
             $entityManager->persist($user);
             $entityManager->flush();
+            // Création du flashbag :
+            $toolbox->generateFlashbag(
+                [
+                    'Votre inscription s\'est bien déroulée.',
+                ],
+                'Inscription',
+                'green'
+            );
+
             // Après le transfert de notre Entity User, on retourne sur l'index :
             return $this->redirectToRoute('app_index');
         }
@@ -178,6 +197,8 @@ class SecurityController extends AbstractController
 
         return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
+
+    // -----------------------------------------------------------------------------------------------------
 
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void

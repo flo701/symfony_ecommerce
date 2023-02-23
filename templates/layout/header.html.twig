@@ -18,18 +18,23 @@
 			</div>
 		{% endif %}
 		<a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CONTACT</a>
-		<div class="w3-dropdown-hover w3-hide-small">
-			<button class="w3-padding-large w3-button" title="plus">PLUS
-				<i class="fa fa-caret-down"></i>
-			</button>
-			<div class="w3-dropdown-content w3-bar-block w3-card-4">
-				<a href="{{ path('order_dashboard') }}" class="w3-bar-item w3-button">TABLEAU DE BORD</a>
-				{% if is_granted('ROLE_ADMIN') %}
-					<a href="{{ path('admin_backoffice') }}" class="w3-bar-item w3-button">BACKOFFICE</a>
-					<a href="{{ path('admin_register') }}" class="w3-bar-item w3-button">INSCRIPTION ADMIN</a>
-				{% endif %}
+		{% if is_granted('ROLE_USER') %}
+			<div class="w3-dropdown-hover w3-hide-small">
+				<button class="w3-padding-large w3-button" title="plus">PLUS
+					<i class="fa fa-caret-down"></i>
+				</button>
+				<div class="w3-dropdown-content w3-bar-block w3-card-4">
+					{% if is_granted('ROLE_CLIENT') %}
+						<a href="{{ path('order_dashboard') }}" class="w3-bar-item w3-button">TABLEAU DE BORD</a>
+					{% endif %}
+					{% if is_granted('ROLE_ADMIN') %}
+						<a href="{{ path('admin_backoffice') }}" class="w3-bar-item w3-button">BACKOFFICE</a>
+						<a href="{{ path('order_dashboard_admin') }}" class="w3-bar-item w3-button">TABLEAU DE BORD</a>
+						<a href="{{ path('admin_register') }}" class="w3-bar-item w3-button">INSCRIPTION ADMIN</a>
+					{% endif %}
+				</div>
 			</div>
-		</div>
+		{% endif %}
 		{% if is_granted('ROLE_USER') %}
 			<a href="{{ path('app_logout') }}" class="w3-bar-item w3-button w3-padding-large w3-hide-small">DECONNEXION</a>
 		{% else %}

@@ -84,3 +84,14 @@ CONSIGNE :
     - OrderController pour l'instant permet à tout utilisateur de valider, modifier ou supprimer n'importe quelle commande tant que son ID est renseigné. Modifier nos méthodes deleteOrder(), deleteReservation(), et validateOrder() de manière à ce que seul un User lié à la commande soit capable de supprimer ou valider les commandes via ces méthodes.
 
 // ----------------------------------------------------------------------------------------------------------------
+
+CONSIGNE :
+	- Selon l'exemple de Flashbag qui a été écrit dans la méthode displayProduct() de notre IndexController, utiliser les Flashbags pour afficher un message indiquant à l'Utilisateur :
+    	- sa réservation a bien été effectuée (en vert) ;
+        - un message indiquant à l'Utilisateur que le stock requis par sa réservation n'est pas disponible (en jaune) suivi d'un second flash indiquant le nombre d'unités contenues dans sa réservation.
+    - Dans OrderController: 
+    	- Un message vert si la commande a bien été validée ;
+        - Un message jaune si une réservation ou une commande a bien été supprimée ;
+        - Un message rouge si vous essayez d'interagir (supprimer ou valider) une commande qui n'est pas la vôtre.
+
+// ----------------------------------------------------------------------------------------------------------------
