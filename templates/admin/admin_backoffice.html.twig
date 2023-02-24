@@ -22,6 +22,32 @@
 			</a>
 		</div>
 		<h3>Liste des produits</h3>
+
+		{% if paginationBar is defined %}
+			{{ paginationBar|raw }}
+		{% endif %}
+
+		<!-- Pagination -->
+		<div class="w3-center">
+			<div
+				class="w3-bar w3-border w3-round">
+				{# Bouton Précédent #}
+				{% if (pageNumber -1) > 0 %}
+					<a href="{{ path('admin_backoffice_page', {'pageNumber': pageNumber - 1}) }}" class="w3-bar-item w3-button">&laquo;</a>
+				{% endif %}
+				{# Frise des pages #}
+				{% for i in (pageNumber - 3)..(pageNumber + 3) %}
+					{% if i > 0 and i <= maxPages %}
+						<a href="{{ path('admin_backoffice_page', {'pageNumber': i}) }}" class="w3-button {# Si le bouton est pageNumber#} {% if i== pageNumber %} w3-green {% endif %}">{{ i }}</a>
+					{% endif %}
+				{% endfor %}
+				{# Bouton Suivant #}
+				{% if pageNumber < maxPages %}
+					<a href="{{ path('admin_backoffice_page', {'pageNumber': pageNumber + 1}) }}" class="w3-button">&raquo;</a>
+				{% endif %}
+			</div>
+		</div>
+
 		<ul class="w3-ul w3-border-white w3-white">
 			{% for product in products %}
 				<li class="w3-padding">

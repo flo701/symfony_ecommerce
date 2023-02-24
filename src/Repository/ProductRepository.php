@@ -21,6 +21,15 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    public function countSize(): int
+    {
+        // Méthode qui nous rend le nombre d'éléments de notre table :
+        return $this->createQueryBuilder('p')
+            ->select('COUNT(p)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function save(Product $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);

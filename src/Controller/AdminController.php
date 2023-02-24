@@ -8,6 +8,7 @@ use App\Entity\Product;
 use App\Entity\Category;
 use App\Form\ProductType;
 use App\Entity\Reservation;
+use App\Service\EcomPagination;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,21 +23,58 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class AdminController extends AbstractController
 {
     #[Route('/', name: 'admin_backoffice')]
-    public function adminBackoffice(ManagerRegistry $doctrine): Response
+    public function adminBackoffice(ManagerRegistry $doctrine, EcomPagination $pagination): Response
     {
         // Cette page affiche la liste des Products et des Tags avec la possibilité de les créer, de les modifier, et de les supprimer, totalisant ainsi les quatre fonctions du CRUD.
 
         // On récupère l'Entity Manager, et les Repositories de Product et Tag :
         $entityManager = $doctrine->getManager();
-        $productRepository = $entityManager->getRepository(Product::class);
         $tagRepository = $entityManager->getRepository(Tag::class);
 
-        // On récupère la liste de nos Products et Tags (deux façons différentes possibles) :
-        $products = array_reverse($productRepository->findAll());
+        // On récupère la liste de nos Products et Tags (deux façons différentes possibles).
+        $products = $pagination->getPageRange(1, 15);
         $tags = $tagRepository->findBy([], ['id' => 'DESC']);
 
         // On transmet nos Products et Tags à notre backoffice :
-        return $this->render('admin/admin_backoffice.html.twig', ['products' => $products, 'tags' => $tags,]);
+        return $this->render('admin/admin_backoffice.html.twig', [
+            'paginationBar' => $pagination->generatePaginationBar(1, 5),
+            'maxPages' => $pagination->getMaxPages(15),
+            'pageNumber' => 1,
+            'products' => $products,
+            'tags' => $tags,
+        ]);
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+
+    #[Route('/products/page/{pageNumber}', name: 'admin_backoffice_page')]
+    public function adminBackofficePages(ManagerRegistry $doctrine, EcomPagination $pagination, int $pageNumber): Response
+    {
+        // Cette page affiche la liste des Products et des Tags avec la possibilité de les créer, de les modifier, et de les supprimer, totalisant ainsi les quatre fonctions du CRUD.
+
+        // On récupère l'Entity Manager, et les Repository de Product et Tag :
+        $entityManager = $doctrine->getManager();
+        $tagRepository = $entityManager->getRepository(Tag::class);
+        // Si le numéro de page est égal ou inférieur à zéro, nous renvoyons l'utilisateur vers le Backoffice :
+        $maxPagesProduct = $pagination->getMaxPages(15);
+        //dd($maxPagesProduct);
+        if ($pageNumber > $maxPagesProduct) {
+            return $this->redirectToRoute('admin_backoffice_page', ['pageNumber' => $maxPagesProduct]);
+        } else if ($pageNumber <= 0) {
+            return $this->redirectToRoute('admin_backoffice');
+        }
+        // On récupère la liste de nos Products et Tags (deux expressions possibles) :
+        $products = $pagination->getPageRange($pageNumber, 15);
+        $tags = $tagRepository->findBy([], ['id' => 'DESC']);
+
+        // On transmet nos Products et Tags à notre backoffice :
+        return $this->render('admin/admin_backoffice.html.twig', [
+            'paginationBar' => $pagination->generatePaginationBar($pageNumber, 5),
+            'maxPages' => $maxPagesProduct,
+            'pageNumber' => $pageNumber,
+            'products' => $products,
+            'tags' => $tags,
+        ]);
     }
 
     // -----------------------------------------------------------------------------------------------------
