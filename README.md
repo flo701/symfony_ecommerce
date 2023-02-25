@@ -5,7 +5,8 @@
 - Placez ce dossier dans C:/xampp/htdocs ;
 - Créez votre propre base de données nommée `symfonyecommerce` ;
 - Importez le fichier `symfonyecommerce.sql` dans votre base de données ;
-- Dans votre terminal, placez-vous dans votre dossier en tapant `c:/xampp/htdocs/symfony_ecommerce-main` ;
+- Dans votre terminal, placez-vous dans votre dossier en tapant `cd c:/xampp/htdocs/symfony_ecommerce-main` ;
+- Installez les dépendances en tapant : `composer -- install` ;
 - Lancez le server en tapant `symfony server:start -d` ;
 - Vous devriez maintenant voir : `Listening on http://127.0.0.1:8000` (un autre port peut être indiqué si le 8000 est déjà utilisé) ;
 - En tapant cette adresse dans votre navigateur, vous devriez avoir accès au site ;
