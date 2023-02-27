@@ -47,14 +47,15 @@
 			{% block body %}{% endblock %}
 
 			{% include 'layout/contact.html.twig' %}
+
 			<!-- End Page Content -->
 		</div>
-	</body>
-</html>
-{% include 'layout/header.html.twig' %}
-{% block javascripts %}
-	<script>
-		// Used to toggle the menu on small screens when clicking on the menu button
+
+		{% include 'layout/footer.html.twig' %}
+
+		{% block javascripts %}
+			<script>
+				// Used to toggle the menu on small screens when clicking on the menu button
 function myFunction() {
 var x = document.getElementById("navDemo");
 if (x.className.indexOf("w3-show") == -1) {
@@ -71,5 +72,7 @@ if (event.target == modal) {
 modal.style.display = "none";
 }
 }
-	</script>
-{% endblock %}</body></html></body></body></html>
+			</script>
+		{% endblock %}
+	</body>
+</html>

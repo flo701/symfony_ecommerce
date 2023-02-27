@@ -34,10 +34,10 @@
 				<div class="w3-third">
 					<p>{{ product.name }}</p>
 					<a href="{{ path('product_display', {'productId' : product.id }) }}">
-						<img src="{{ asset('assets/img/' ~ product.thumbnail ~ '.jpg') }}" class="w3-round w3-margin-bottom" alt="{{ product.name }}" style="width:60%">
+						<img src="{{ asset(product.thumbnail) }}" class="w3-round w3-margin-bottom" alt="{{ product.name }}" style="width:60%">
 					</a>
 				</div>
 			{% endfor %}
 		</div>
 	</div>
-</div>{% endblock %}
+{% endblock %}

@@ -11,6 +11,9 @@
 			<i>Liste des Tags et Produits</i>
 		</p>
 		<div class="w3-center">
+			<a href="{{ path('productimg_create') }}" class="w3-button w3-black">
+				Créer Image Produit
+			</a>
 			<a href="{{ path('product_create') }}" class="w3-button w3-blue">
 				Créer Produit
 			</a>
@@ -21,50 +24,32 @@
 				Réinitialiser Catalogue
 			</a>
 		</div>
-		<h3>Liste des produits</h3>
 
-		{% if paginationBar is defined %}
-			{{ paginationBar|raw }}
+		<!-- Pagination et Produits -->
+		{% if pagination is defined %}
+			<h3>Liste des Produits</h3>
+
+			{{ pagination.generatePaginationBar()|raw }}
+
+			<ul class="w3-ul w3-border-white w3-white">
+				{% for product in pagination.pageRange %}
+					<li class="w3-padding">
+						<p>
+							<b>{{ product.name }}</b>
+							:
+							{{ product.category.name }}
+							<a href="{{ path('product_delete', { 'productId' : product.id }) }}" class="w3-button w3-red w3-right">
+								Supprimer
+							</a>
+							<a href="{{ path('product_update', { 'productId' : product.id }) }}" class="w3-button w3-orange w3-right" style="margin-right:5px">
+								Modifier
+							</a>
+						</p>
+					</li>
+				{% endfor %}
+			</ul>
 		{% endif %}
 
-		<!-- Pagination -->
-		<div class="w3-center">
-			<div
-				class="w3-bar w3-border w3-round">
-				{# Bouton Précédent #}
-				{% if (pageNumber -1) > 0 %}
-					<a href="{{ path('admin_backoffice_page', {'pageNumber': pageNumber - 1}) }}" class="w3-bar-item w3-button">&laquo;</a>
-				{% endif %}
-				{# Frise des pages #}
-				{% for i in (pageNumber - 3)..(pageNumber + 3) %}
-					{% if i > 0 and i <= maxPages %}
-						<a href="{{ path('admin_backoffice_page', {'pageNumber': i}) }}" class="w3-button {# Si le bouton est pageNumber#} {% if i== pageNumber %} w3-green {% endif %}">{{ i }}</a>
-					{% endif %}
-				{% endfor %}
-				{# Bouton Suivant #}
-				{% if pageNumber < maxPages %}
-					<a href="{{ path('admin_backoffice_page', {'pageNumber': pageNumber + 1}) }}" class="w3-button">&raquo;</a>
-				{% endif %}
-			</div>
-		</div>
-
-		<ul class="w3-ul w3-border-white w3-white">
-			{% for product in products %}
-				<li class="w3-padding">
-					<p>
-						<b>{{ product.name }}</b>
-						:
-						{{ product.category.name }}
-						<a href="{{ path('product_delete', { 'productId' : product.id }) }}" class="w3-button w3-red w3-right">
-							Supprimer
-						</a>
-						<a href="{{ path('product_update', { 'productId' : product.id }) }}" class="w3-button w3-orange w3-right" style="margin-right:5px">
-							Modifier
-						</a>
-					</p>
-				</li>
-			{% endfor %}
-		</ul>
 		<h3>Liste des Tags</h3>
 		<ul class="w3-ul w3-border-white w3-white">
 			{% for tag in tags %}

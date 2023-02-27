@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Tag;
 use App\Entity\Product;
 use App\Entity\Category;
+use App\Entity\ProductImg;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -61,6 +62,17 @@ class ProductType extends AbstractType
                 'choice_label' => 'name', // Attribut utilisé pour représenter l'Entity
                 'expanded' => true, // Les options sont les unes à côté des autres
                 'multiple' => true, // On peut choisir plusieurs Tags 
+                'attr' => [
+                    'class' => 'w3-input w3-border w3-round w3-light-grey',
+                ]
+            ])
+            ->add('productImg', EntityType::class, [
+                'label' => 'Image liée',
+                'class' => ProductImg::class, // Classe Entity utilisée pour notre champ 
+                'choice_label' => 'name', // Attribut utilisé pour représenter l'Entity
+                'required' => false,
+                'expanded' => false, // Affichage d'un menu déroulant 
+                'multiple' => false, // On ne peut PAS choisir plusieurs Images
                 'attr' => [
                     'class' => 'w3-input w3-border w3-round w3-light-grey',
                 ]

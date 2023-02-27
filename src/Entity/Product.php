@@ -37,32 +37,44 @@ class Product
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Reservation::class)]
     private Collection $reservations;
 
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?ProductImg $productImg = null;
+
     public function __construct()
     {
         $this->tags = new ArrayCollection();
         $this->reservations = new ArrayCollection();
     }
 
-    public function getThumbnail(): string // (thumbnail signifie vignette, miniature, aperçu)
+    public function getThumbnail(): string
     {
-        // Cette méthode rend le nom d'un fichier vignette selon la catégorie de notre Product :
-        if ($this->category) {
-            // Dans cette variable Switch, nous récupérons le nom de l'objet Category lié afin de déterminer le nom de la vignette, avec un strtolower afin d'éviter les problèmes de case :
+        //Cette méthode rend le nom d'un fichier vignette selon la catégorie de notre Product
+        $address = "assets/img/";
+        if ($this->productImg) {
+            return $this->productImg->getFileAddress();
+        } else if ($this->category) {
+            //Dans cette variable Switch, nous récupérons le nom de l'objet Category lié afin de déterminer le nom de la vignette, avec un strtolower afin d'éviter les problèmes de casse :
             switch (strtolower($this->category->getName())) {
                 case 'chaise':
-                    return 'placeholder_chaise';
+                    $address .= 'placeholder_chaise.jpg';
+                    break;
                 case 'armoire':
-                    return 'placeholder_armoire';
+                    $address .=  'placeholder_armoire.jpg';
+                    break;
                 case 'lit':
-                    return 'placeholder_lit';
+                    $address .=  'placeholder_lit.jpg';
+                    break;
                 case 'bureau':
-                    return 'placeholder_bureau';
+                    $address .=  'placeholder_bureau.jpg';
+                    break;
                 case 'canape':
-                    return 'placeholder_canape';
+                    $address .=  'placeholder_canape.jpg';
+                    break;
                 default:
-                    return 'placeholder_none';
+                    $address .=  'placeholder_none.jpg';
             }
-        } else return 'placeholder_none';
+        } else $address .= 'placeholder_none.jpg';
+        return $address;
     }
 
     public function getId(): ?int
@@ -180,6 +192,18 @@ class Product
                 $reservation->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProductImg(): ?ProductImg
+    {
+        return $this->productImg;
+    }
+
+    public function setProductImg(?ProductImg $productImg): self
+    {
+        $this->productImg = $productImg;
 
         return $this;
     }

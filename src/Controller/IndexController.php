@@ -7,6 +7,7 @@ use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\Category;
 use App\Entity\Reservation;
+use App\Service\EcomPagination;
 use App\Service\EcomToolbox;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;

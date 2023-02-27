@@ -7,16 +7,20 @@ use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\Category;
 use App\Form\ProductType;
+use App\Entity\ProductImg;
 use App\Entity\Reservation;
+use App\Form\ProductImgType;
 use App\Service\EcomPagination;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 #[Security('is_granted("ROLE_ADMIN")')]
 #[Route('/admin')]
@@ -31,16 +35,12 @@ class AdminController extends AbstractController
         $entityManager = $doctrine->getManager();
         $tagRepository = $entityManager->getRepository(Tag::class);
 
-        // On récupère la liste de nos Products et Tags (deux façons différentes possibles).
-        $products = $pagination->getPageRange(1, 15);
+        // On récupère la liste de nos Tags :
         $tags = $tagRepository->findBy([], ['id' => 'DESC']);
 
         // On transmet nos Products et Tags à notre backoffice :
         return $this->render('admin/admin_backoffice.html.twig', [
-            'paginationBar' => $pagination->generatePaginationBar(1, 5),
-            'maxPages' => $pagination->getMaxPages(15),
-            'pageNumber' => 1,
-            'products' => $products,
+            'pagination' => $pagination->generatePagination(1, 'products/'),
             'tags' => $tags,
         ]);
     }
@@ -63,16 +63,12 @@ class AdminController extends AbstractController
         } else if ($pageNumber <= 0) {
             return $this->redirectToRoute('admin_backoffice');
         }
-        // On récupère la liste de nos Products et Tags (deux expressions possibles) :
-        $products = $pagination->getPageRange($pageNumber, 15);
+        // On récupère la liste de nos Tags :
         $tags = $tagRepository->findBy([], ['id' => 'DESC']);
 
-        // On transmet nos Products et Tags à notre backoffice :
+        // On transmet notre Pagination de Products et nos Tags à notre backoffice :
         return $this->render('admin/admin_backoffice.html.twig', [
-            'paginationBar' => $pagination->generatePaginationBar($pageNumber, 5),
-            'maxPages' => $maxPagesProduct,
-            'pageNumber' => $pageNumber,
-            'products' => $products,
+            'pagination' => $pagination->generatePagination($pageNumber, 'products/'),
             'tags' => $tags,
         ]);
     }
@@ -296,6 +292,59 @@ class AdminController extends AbstractController
         $entityManager->remove($product);
         $entityManager->flush();
         return $this->redirectToRoute('admin_backoffice');
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+
+    #[Route('/productimg/create', name: 'productimg_create')]
+    public function createProductImg(Request $request, ManagerRegistry $doctrine, SluggerInterface $slugger): Response
+    {
+        // Cette méthode a pour objectif de mettre en ligne une nouvelle image qui pourra être utilisée pour illustrer nos Products.
+
+        // On récupère l'Entity Manager :
+        $entityManager = $doctrine->getManager();
+
+        // On crée une nouvelle Entity ProductImg liée à notre nouveau formulaire :
+        $productImg = new ProductImg;
+        $imgForm = $this->createForm(ProductImgType::class, $productImg);
+        // Nous gérons la requête et mettons en ligne l'Entity si le formulaire est validé :
+        $imgForm->handleRequest($request);
+
+        if ($imgForm->isSubmitted() && $imgForm->isValid()) {
+            // Nous récupérons la valeur du champ de l'image :
+            $imgFile = $imgForm->get('imagefile')->getData();
+            // Si ce champ "image file" est vide, il est inutile de le mettre en ligne. Sinon :
+            if ($imgFile) {
+                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // Nous préparons le nom de fichier de manière à l'intégrer sans risque dans une URL. Nous devinons également l'extension automatiquement pour des raisons de sécurité :
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imgFile->guessExtension();
+
+                // On déplace le fichier :
+                try {
+                    $imgFile->move(
+                        $this->getParameter('img_directory'),
+                        $newFilename,
+                    );
+                    $productImg->setFilename($newFilename);
+                    $productImg->setFileAddress('assets/img/upload/' . $newFilename);
+                } catch (FileException $e) {
+                    // On capture l'erreur si un problème survient :
+                    $productImg->setFilename("non défini");
+                    $productImg->setFileAddress("non définie");
+                }
+            }
+            // Persistance de ProductImg :
+            $productImg->setCreationDate(new \DateTime("now"));
+            $entityManager->persist($productImg);
+            $entityManager->flush();
+            return $this->redirectToRoute('admin_backoffice');
+        }
+        // Si le formulaire n'est pas rempli, nous le présentons à l'utilisateur :
+        return $this->render('index/dataform.html.twig', [
+            'formName' => 'Mise en ligne d\'image',
+            'dataForm' => $imgForm->createView()
+        ]);
     }
 
     // -----------------------------------------------------------------------------------------------------------
@@ -529,5 +578,4 @@ class AdminController extends AbstractController
     }
 
     // -----------------------------------------------------------------------------------------------------------
-
 }
