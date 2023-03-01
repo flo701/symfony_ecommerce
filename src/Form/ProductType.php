@@ -38,7 +38,7 @@ class ProductType extends AbstractType
                 ]
             ])
             ->add('description', TextareaType::class, [
-                'label' => 'Desciption du Produit',
+                'label' => 'Description du Produit',
                 'attr' => [
                     'class' => 'w3-input w3-border w3-round w3-light-grey',
                 ]
