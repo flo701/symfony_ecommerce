@@ -26,7 +26,8 @@ class Reservation
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     private ?Product $product = null;
 
-    public function __construct(int $quantity, Product $product = null) // On ajoute cette fonction
+    // On ajoute cette méthode :
+    public function __construct(int $quantity, Product $product = null)
     {
         $this->quantity = $quantity;
         $this->product = $product;

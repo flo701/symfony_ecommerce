@@ -175,7 +175,7 @@ class IndexController extends AbstractController
             if ($product->getStock() > 0 && $user) {
                 if ($product->getStock() > $quantity) { // Suffisamment de stock
                     $product->setStock($product->getStock() - $quantity);
-                    // Création du flashbag de succès de réservation, en activant le panneau, en indiquant le titre et le statut (couleur du panneau), et enfin les messages flash à afficher ::
+                    // Création du flashbag de succès de réservation, en activant le panneau, en indiquant le titre et le statut (couleur du panneau), et enfin les messages flash à afficher :
                     $toolbox->generateFlashbag(
                         [
                             'Votre commande a bien été prise en compte',
@@ -217,7 +217,11 @@ class IndexController extends AbstractController
         }
 
         // Si nous avons notre Product, nous l'envoyons sur la page Twig dédiée :
-        return $this->render('index/product_display.html.twig', ['categories' => $categories, 'product' => $product, 'buyForm' => $buyForm->createView(),]);
+        return $this->render('index/product_display.html.twig', [
+            'categories' => $categories,
+            'product' => $product,
+            'buyForm' => $buyForm->createView(),
+        ]);
     }
 
     // -----------------------------------------------------------------------------------------------------------
